@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Final Page</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #fff5fb;
+        --card: #ffffff;
+        --text: #3a2230;
+        --muted: #7d5c70;
+        --primary: #ff4d8d;
+        --secondary: #ffd6e8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: "Poppins", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #ffe7f4, var(--bg));
+        color: var(--text);
+        overflow: hidden;
+      }
+
+      .stage {
+        width: min(700px, calc(100vw - 2rem));
+        background: var(--card);
+        border-radius: 24px;
+        padding: 2.4rem;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(255, 77, 141, 0.15);
+        position: relative;
+        z-index: 2;
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0.75rem 0 0;
+        font-size: clamp(1.6rem, 3vw, 2.4rem);
+        line-height: 1.35;
+      }
+
+      .actions {
+        margin-top: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        font: inherit;
+        transition: transform 0.15s ease, filter 0.2s ease;
+      }
+
+      .cta {
+        background: var(--primary);
+        color: #fff;
+        padding: 0.9rem 1.5rem;
+        font-weight: 700;
+      }
+
+      .alt {
+        background: var(--secondary);
+        color: var(--text);
+        padding: 0.9rem 1.3rem;
+        font-weight: 600;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.02);
+      }
+
+      .celebration {
+        margin-top: 1.4rem;
+        min-height: 2rem;
+        color: #d3276d;
+        font-weight: 600;
+      }
+
+      .heart {
+        position: fixed;
+        bottom: -20px;
+        font-size: 1.25rem;
+        opacity: 0;
+        animation: floatUp linear forwards;
+        z-index: 1;
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(0) scale(0.7);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-115vh) scale(1.2);
+          opacity: 0;
+        }
+      }
+
+      canvas#confetti {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="confetti"></canvas>
+
+    <main class="stage">
+      <p class="eyebrow" id="eyebrow"></p>
+      <h1 id="oneLiner"></h1>
+
+      <section class="actions">
+        <button id="primaryBtn" class="cta" type="button"></button>
+        <button id="secondaryBtn" class="alt" type="button"></button>
+      </section>
+
+      <p id="successNote" class="celebration" aria-live="polite"></p>
+    </main>
+
+    <script>
+      const pageContent = {
+        eyebrow: "Final Step",
+        oneLiner: "Every beat of my heart still chooses you.",
+        primaryCTA: "Yes, my love 💖",
+        secondaryCTA: "Need one more dramatic pause? 😌",
+        successPrimary: "You said yes! Cue the sparkles, kisses, and our forever chapter ✨",
+        successSecondary: "Okay, dramatic pause activated... but my heart still says it's you 💞",
+        hearts: ["💖", "💕", "💘", "💓", "💗"],
+      };
+
+      const ui = {
+        eyebrow: document.getElementById("eyebrow"),
+        oneLiner: document.getElementById("oneLiner"),
+        primaryBtn: document.getElementById("primaryBtn"),
+        secondaryBtn: document.getElementById("secondaryBtn"),
+        successNote: document.getElementById("successNote"),
+      };
+
+      ui.eyebrow.textContent = pageContent.eyebrow;
+      ui.oneLiner.textContent = pageContent.oneLiner;
+      ui.primaryBtn.textContent = pageContent.primaryCTA;
+      ui.secondaryBtn.textContent = pageContent.secondaryCTA;
+
+      function burstHearts(amount = 22) {
+        for (let i = 0; i < amount; i += 1) {
+          const heart = document.createElement("span");
+          heart.className = "heart";
+          heart.textContent =
+            pageContent.hearts[Math.floor(Math.random() * pageContent.hearts.length)];
+          heart.style.left = `${Math.random() * 100}vw`;
+          heart.style.animationDuration = `${2 + Math.random() * 2}s`;
+          heart.style.animationDelay = `${Math.random() * 0.3}s`;
+          document.body.appendChild(heart);
+          setTimeout(() => heart.remove(), 4200);
+        }
+      }
+
+      const confettiCanvas = document.getElementById("confetti");
+      const ctx = confettiCanvas.getContext("2d");
+
+      function launchConfetti() {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+
+        const particles = Array.from({ length: 160 }, () => ({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * -confettiCanvas.height,
+          size: 4 + Math.random() * 5,
+          speedY: 2 + Math.random() * 4,
+          speedX: -1 + Math.random() * 2,
+          color: ["#ff4d8d", "#ffd166", "#64dfdf", "#b388ff"][Math.floor(Math.random() * 4)],
+          tilt: Math.random() * 10,
+        }));
+
+        const duration = 1800;
+        const start = performance.now();
+
+        function frame(now) {
+          ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+          particles.forEach((p) => {
+            p.x += p.speedX;
+            p.y += p.speedY;
+            p.tilt += 0.15;
+
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x + Math.sin(p.tilt), p.y, p.size, p.size * 0.6);
+          });
+
+          if (now - start < duration) {
+            requestAnimationFrame(frame);
+          } else {
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+          }
+        }
+
+        requestAnimationFrame(frame);
+      }
+
+      function celebrate(note) {
+        ui.successNote.textContent = note;
+        burstHearts();
+        launchConfetti();
+      }
+
+      ui.primaryBtn.addEventListener("click", () => {
+        celebrate(pageContent.successPrimary);
+      });
+
+      ui.secondaryBtn.addEventListener("click", () => {
+        celebrate(pageContent.successSecondary);
+      });
+
+      window.addEventListener("resize", () => {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+      });
+    </script>
+  </body>
+</html>
